@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  caddy-proxy:
+    build: .
+    image: ph-caddy-proxy:latest
+    container_name: ph-caddy-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"  # Caddy admin endpoint
+    environment:
+      - TRACKING_DOMAIN=${TRACKING_DOMAIN:-localhost}
+      - POSTHOG_HOST=${POSTHOG_HOST:-us.i.posthog.com}
+      - POSTHOG_ASSETS_HOST=${POSTHOG_ASSETS_HOST:-us-assets.i.posthog.com}
+      - SUBPATH=${SUBPATH:-}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
+      - DEBUG=${DEBUG:-false}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks:
+      - proxy
+
+volumes:
+  caddy_data:
+    external: false
+  caddy_config:
+    external: false
+
+networks:
+  proxy:
+    name: proxy_network
+    driver: bridge
