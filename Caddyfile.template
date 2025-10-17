@@ -4,29 +4,15 @@
 # - POSTHOG_HOST: PostHog host (default: us.i.posthog.com)
 # - POSTHOG_ASSETS_HOST: PostHog assets host (default: us-assets.i.posthog.com)
 # - SUBPATH: Optional subpath for the proxy (e.g., /phproxy)
-# - CORS_ORIGIN: CORS allowed origin (default: https://${TRACKING_DOMAIN})
-# - USE_HTTPS: Whether to use HTTPS (default: true)
+# - CORS_ENABLED: Enable CORS headers (default: false)
+# - CORS_ORIGIN: CORS allowed origin (default: *)
 
 ${TRACKING_DOMAIN} {
-	# CORS configuration
-	header {
-		Access-Control-Allow-Origin ${CORS_ORIGIN}
-		Access-Control-Allow-Methods "GET, POST, OPTIONS"
-		Access-Control-Allow-Headers "Content-Type, Authorization"
-		Access-Control-Allow-Credentials "true"
-	}
-
-	# Handle OPTIONS requests for CORS preflight
-	@options {
-		method OPTIONS
-	}
-	respond @options 204
-
+	${CORS_BLOCK}
 	# Static assets handler
 	handle ${SUBPATH}/static* {
 		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
 			header_up Host ${POSTHOG_ASSETS_HOST}
-			header_down -Access-Control-Allow-Origin
 
 			# Rewrite path if using subpath
 			@hasSubpath expression "${SUBPATH} != ''"
@@ -38,7 +24,6 @@ ${TRACKING_DOMAIN} {
 	handle ${SUBPATH}* {
 		reverse_proxy https://${POSTHOG_HOST}:443 {
 			header_up Host ${POSTHOG_HOST}
-			header_down -Access-Control-Allow-Origin
 
 			# Rewrite path if using subpath
 			@hasSubpath expression "${SUBPATH} != ''"
@@ -50,7 +35,6 @@ ${TRACKING_DOMAIN} {
 	handle {
 		reverse_proxy https://${POSTHOG_HOST}:443 {
 			header_up Host ${POSTHOG_HOST}
-			header_down -Access-Control-Allow-Origin
 		}
 	}
 }

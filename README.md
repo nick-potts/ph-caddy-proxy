@@ -9,9 +9,9 @@ A configurable Caddy-based reverse proxy for PostHog analytics with Docker suppo
 - 🐳 Docker and Docker Compose support
 - 📦 Automatic multi-platform builds (amd64/arm64)
 - 🔄 GitHub Actions CI/CD pipeline
-- 🌐 CORS handling
 - 🔐 SSL/TLS support via Caddy
 - 📊 Support for both US and EU PostHog regions
+- 🌐 Optional CORS configuration
 
 ## Quick Start
 
@@ -69,7 +69,8 @@ docker pull ghcr.io/yourusername/ph-caddy-proxy:latest
 | `POSTHOG_HOST` | PostHog API host | us.i.posthog.com |
 | `POSTHOG_ASSETS_HOST` | PostHog assets host | us-assets.i.posthog.com |
 | `SUBPATH` | Optional subpath for the proxy (e.g., /phproxy) | (empty) |
-| `CORS_ORIGIN` | CORS allowed origin | https://${TRACKING_DOMAIN} |
+| `CORS_ENABLED` | Enable CORS headers | false |
+| `CORS_ORIGIN` | CORS allowed origin (when CORS_ENABLED=true) | * |
 | `DEBUG` | Enable debug mode to see generated Caddyfile | false |
 
 ### Region Configuration
@@ -117,6 +118,18 @@ posthog.init('YOUR_PROJECT_API_KEY', {
 })
 ```
 
+## Enabling CORS (Optional)
+
+By default, CORS is disabled to allow unrestricted access. If you need to restrict which domains can use your proxy:
+
+1. Set environment variables:
+```bash
+CORS_ENABLED=true
+CORS_ORIGIN=https://mysite.com  # Or use * to allow all origins
+```
+
+2. The proxy will then send appropriate CORS headers for cross-origin requests.
+
 ## Development
 
 ### Building Locally
@@ -158,7 +171,7 @@ Builds are triggered on:
 ## Security Considerations
 
 - **SSL/TLS**: Caddy automatically provisions and renews SSL certificates via Let's Encrypt
-- **CORS**: Configure `CORS_ORIGIN` to restrict which domains can make requests
+- **CORS**: Optional - enable with `CORS_ENABLED=true` and configure `CORS_ORIGIN` to restrict which domains can make requests
 - **Data Privacy**: This proxy doesn't store or log any analytics data - it only forwards requests
 
 ## Troubleshooting
@@ -184,7 +197,7 @@ docker-compose logs -f caddy-proxy
 
 2. **SSL certificate issues**: Ensure your domain's DNS points to the server and ports 80/443 are accessible
 
-3. **CORS errors**: Check that `CORS_ORIGIN` matches your application's domain
+3. **CORS errors**: Enable CORS with `CORS_ENABLED=true` and ensure `CORS_ORIGIN` matches your application's domain
 
 ## Contributing
 

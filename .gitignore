@@ -10,6 +10,7 @@ caddy_config/
 # IDE files
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~
