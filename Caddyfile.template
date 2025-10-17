@@ -3,17 +3,25 @@
 # - TRACKING_DOMAIN: Your tracking domain (e.g., tracking.example.com)
 # - POSTHOG_HOST: PostHog host (default: us.i.posthog.com)
 # - POSTHOG_ASSETS_HOST: PostHog assets host (default: us-assets.i.posthog.com)
-# - SUBPATH: Optional subpath for the proxy (e.g., /phproxy)
 # - SSL_ENABLED: Enable HTTPS/SSL (default: true)
-# - CORS_ENABLED: Enable CORS headers (default: false)
-# - CORS_ORIGIN: CORS allowed origin (default: https://${TRACKING_DOMAIN})
 
 ${DOMAIN_CONFIG} {
-${CORS_BLOCK}
 	# Health check endpoint
 	handle /healthz {
 		respond "OK" 200
 	}
 
-${SUBPATH_HANDLERS}
+	handle /static {
+		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
+			header_up Host ${POSTHOG_ASSETS_HOST}
+			header_down -Access-Control-Allow-Origin
+		}
+	}
+
+	handle {
+		reverse_proxy https://${POSTHOG_HOST}:443 {
+			header_up Host ${POSTHOG_HOST}
+			header_down -Access-Control-Allow-Origin
+		}
+	}
 }
