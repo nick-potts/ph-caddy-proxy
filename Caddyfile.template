@@ -4,10 +4,11 @@
 # - POSTHOG_HOST: PostHog host (default: us.i.posthog.com)
 # - POSTHOG_ASSETS_HOST: PostHog assets host (default: us-assets.i.posthog.com)
 # - SUBPATH: Optional subpath for the proxy (e.g., /phproxy)
+# - SSL_ENABLED: Enable HTTPS/SSL (default: true)
 # - CORS_ENABLED: Enable CORS headers (default: false)
 # - CORS_ORIGIN: CORS allowed origin (default: https://${TRACKING_DOMAIN})
 
-${TRACKING_DOMAIN} {
+${DOMAIN_CONFIG} {
 ${CORS_BLOCK}
 ${SUBPATH_HANDLERS}
 }

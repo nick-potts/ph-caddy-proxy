@@ -8,6 +8,7 @@ set -e
 : ${SUBPATH:=""}
 : ${CORS_ENABLED:="false"}
 : ${CORS_ORIGIN:="https://${TRACKING_DOMAIN}"}
+: ${SSL_ENABLED:="true"}
 
 # Generate CORS block if enabled
 if [ "${CORS_ENABLED}" = "true" ]; then
@@ -56,8 +57,15 @@ else
 "
 fi
 
+# Configure domain with or without SSL
+if [ "${SSL_ENABLED}" = "false" ]; then
+    DOMAIN_CONFIG="http://${TRACKING_DOMAIN}"
+else
+    DOMAIN_CONFIG="${TRACKING_DOMAIN}"
+fi
+
 # Export variables for envsubst
-export TRACKING_DOMAIN POSTHOG_HOST POSTHOG_ASSETS_HOST SUBPATH CORS_BLOCK SUBPATH_HANDLERS
+export DOMAIN_CONFIG TRACKING_DOMAIN POSTHOG_HOST POSTHOG_ASSETS_HOST SUBPATH CORS_BLOCK SUBPATH_HANDLERS
 
 # Substitute environment variables in the Caddyfile template
 echo "Configuring Caddy with:"
@@ -65,6 +73,7 @@ echo "  TRACKING_DOMAIN: ${TRACKING_DOMAIN}"
 echo "  POSTHOG_HOST: ${POSTHOG_HOST}"
 echo "  POSTHOG_ASSETS_HOST: ${POSTHOG_ASSETS_HOST}"
 echo "  SUBPATH: ${SUBPATH:-'(none)'}"
+echo "  SSL_ENABLED: ${SSL_ENABLED}"
 echo "  CORS_ENABLED: ${CORS_ENABLED}"
 if [ "${CORS_ENABLED}" = "true" ]; then
     echo "  CORS_ORIGIN: ${CORS_ORIGIN}"

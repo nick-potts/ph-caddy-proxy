@@ -48,6 +48,7 @@ docker run -d \
   -e TRACKING_DOMAIN=tracking.example.com \
   -e POSTHOG_HOST=us.i.posthog.com \
   -e POSTHOG_ASSETS_HOST=us-assets.i.posthog.com \
+  -e SSL_ENABLED=true \
   -v caddy_data:/data \
   -v caddy_config:/config \
   ghcr.io/yourusername/ph-caddy-proxy:latest
@@ -69,6 +70,7 @@ docker pull ghcr.io/yourusername/ph-caddy-proxy:latest
 | `POSTHOG_HOST` | PostHog API host | us.i.posthog.com |
 | `POSTHOG_ASSETS_HOST` | PostHog assets host | us-assets.i.posthog.com |
 | `SUBPATH` | Optional subpath for the proxy (e.g., /phproxy) | (empty) |
+| `SSL_ENABLED` | Enable HTTPS/SSL (set to false for local dev or behind proxy) | true |
 | `CORS_ENABLED` | Enable CORS headers | false |
 | `CORS_ORIGIN` | CORS allowed origin (when CORS_ENABLED=true) | https://${TRACKING_DOMAIN} |
 | `DEBUG` | Enable debug mode to see generated Caddyfile | false |
@@ -117,6 +119,16 @@ posthog.init('YOUR_PROJECT_API_KEY', {
     ui_host: 'https://us.posthog.com'
 })
 ```
+
+## Disabling SSL (For Local Development)
+
+By default, SSL is enabled and Caddy will automatically provision certificates. To disable SSL for local development or when running behind another SSL proxy:
+
+```bash
+SSL_ENABLED=false
+```
+
+This will configure Caddy to serve HTTP only on port 80.
 
 ## Enabling CORS (Optional)
 
