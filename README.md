@@ -70,7 +70,7 @@ docker pull ghcr.io/yourusername/ph-caddy-proxy:latest
 | `POSTHOG_ASSETS_HOST` | PostHog assets host | us-assets.i.posthog.com |
 | `SUBPATH` | Optional subpath for the proxy (e.g., /phproxy) | (empty) |
 | `CORS_ENABLED` | Enable CORS headers | false |
-| `CORS_ORIGIN` | CORS allowed origin (when CORS_ENABLED=true) | * |
+| `CORS_ORIGIN` | CORS allowed origin (when CORS_ENABLED=true) | https://${TRACKING_DOMAIN} |
 | `DEBUG` | Enable debug mode to see generated Caddyfile | false |
 
 ### Region Configuration

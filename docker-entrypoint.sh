@@ -7,30 +7,57 @@ set -e
 : ${POSTHOG_ASSETS_HOST:="us-assets.i.posthog.com"}
 : ${SUBPATH:=""}
 : ${CORS_ENABLED:="false"}
-: ${CORS_ORIGIN:="*"}
+: ${CORS_ORIGIN:="https://${TRACKING_DOMAIN}"}
 
 # Generate CORS block if enabled
 if [ "${CORS_ENABLED}" = "true" ]; then
-    CORS_BLOCK="# CORS configuration
-	header {
+    CORS_BLOCK="header {
 		Access-Control-Allow-Origin ${CORS_ORIGIN}
-		Access-Control-Allow-Methods \"GET, POST, OPTIONS\"
-		Access-Control-Allow-Headers \"Content-Type, Authorization\"
-		Access-Control-Allow-Credentials \"true\"
 	}
-
-	# Handle OPTIONS requests for CORS preflight
-	@options {
-		method OPTIONS
-	}
-	respond @options 204
 "
 else
     CORS_BLOCK=""
 fi
 
+# Generate handlers based on whether subpath is used
+if [ -n "${SUBPATH}" ]; then
+    # Using subpath - use handle_path to strip the prefix
+    SUBPATH_HANDLERS="handle_path ${SUBPATH}/static* {
+		rewrite * /static{path}
+		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
+			header_up Host ${POSTHOG_ASSETS_HOST}
+			header_down -Access-Control-Allow-Origin
+		}
+	}
+
+	handle_path ${SUBPATH}* {
+		rewrite * {path}
+		reverse_proxy https://${POSTHOG_HOST}:443 {
+			header_up Host ${POSTHOG_HOST}
+			header_down -Access-Control-Allow-Origin
+		}
+	}
+"
+else
+    # No subpath - use the simple version
+    SUBPATH_HANDLERS="handle /static {
+		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
+			header_up Host ${POSTHOG_ASSETS_HOST}
+			header_down -Access-Control-Allow-Origin
+		}
+	}
+
+	handle {
+		reverse_proxy https://${POSTHOG_HOST}:443 {
+			header_up Host ${POSTHOG_HOST}
+			header_down -Access-Control-Allow-Origin
+		}
+	}
+"
+fi
+
 # Export variables for envsubst
-export TRACKING_DOMAIN POSTHOG_HOST POSTHOG_ASSETS_HOST SUBPATH CORS_BLOCK
+export TRACKING_DOMAIN POSTHOG_HOST POSTHOG_ASSETS_HOST SUBPATH CORS_BLOCK SUBPATH_HANDLERS
 
 # Substitute environment variables in the Caddyfile template
 echo "Configuring Caddy with:"

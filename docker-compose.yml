@@ -15,7 +15,7 @@ services:
       - POSTHOG_ASSETS_HOST=${POSTHOG_ASSETS_HOST:-us-assets.i.posthog.com}
       - SUBPATH=${SUBPATH:-}
       - CORS_ENABLED=${CORS_ENABLED:-false}
-      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://localhost}
       - DEBUG=${DEBUG:-false}
     volumes:
       - caddy_data:/data

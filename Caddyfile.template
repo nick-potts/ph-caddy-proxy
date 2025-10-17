@@ -5,36 +5,9 @@
 # - POSTHOG_ASSETS_HOST: PostHog assets host (default: us-assets.i.posthog.com)
 # - SUBPATH: Optional subpath for the proxy (e.g., /phproxy)
 # - CORS_ENABLED: Enable CORS headers (default: false)
-# - CORS_ORIGIN: CORS allowed origin (default: *)
+# - CORS_ORIGIN: CORS allowed origin (default: https://${TRACKING_DOMAIN})
 
 ${TRACKING_DOMAIN} {
-	${CORS_BLOCK}
-	# Static assets handler
-	handle ${SUBPATH}/static* {
-		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
-			header_up Host ${POSTHOG_ASSETS_HOST}
-
-			# Rewrite path if using subpath
-			@hasSubpath expression "${SUBPATH} != ''"
-			rewrite @hasSubpath {path} {path:${SUBPATH}/}
-		}
-	}
-
-	# Main PostHog API handler
-	handle ${SUBPATH}* {
-		reverse_proxy https://${POSTHOG_HOST}:443 {
-			header_up Host ${POSTHOG_HOST}
-
-			# Rewrite path if using subpath
-			@hasSubpath expression "${SUBPATH} != ''"
-			rewrite @hasSubpath {path} {path:${SUBPATH}/}
-		}
-	}
-
-	# Default handler
-	handle {
-		reverse_proxy https://${POSTHOG_HOST}:443 {
-			header_up Host ${POSTHOG_HOST}
-		}
-	}
+${CORS_BLOCK}
+${SUBPATH_HANDLERS}
 }
