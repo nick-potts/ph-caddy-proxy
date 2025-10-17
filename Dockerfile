@@ -1,7 +1,7 @@
 FROM caddy:2-alpine
 
-# Install envsubst for environment variable substitution
-RUN apk add --no-cache gettext
+# Install envsubst for environment variable substitution and wget for health checks
+RUN apk add --no-cache gettext wget
 
 # Copy Caddyfile template
 COPY Caddyfile.template /etc/caddy/Caddyfile.template

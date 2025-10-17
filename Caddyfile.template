@@ -10,5 +10,10 @@
 
 ${DOMAIN_CONFIG} {
 ${CORS_BLOCK}
+	# Health check endpoint
+	handle /healthz {
+		respond "OK" 200
+	}
+
 ${SUBPATH_HANDLERS}
 }

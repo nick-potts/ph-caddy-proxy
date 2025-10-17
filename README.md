@@ -12,6 +12,7 @@ A configurable Caddy-based reverse proxy for PostHog analytics with Docker suppo
 - 🔐 SSL/TLS support via Caddy
 - 📊 Support for both US and EU PostHog regions
 - 🌐 Optional CORS configuration
+- 💓 Health check endpoint (`/healthz`) for monitoring
 
 ## Quick Start
 
@@ -120,6 +121,25 @@ posthog.init('YOUR_PROJECT_API_KEY', {
 })
 ```
 
+## Health Monitoring
+
+The proxy includes a health check endpoint at `/healthz` that returns:
+- **Status Code**: 200 OK
+- **Response Body**: "OK"
+
+This endpoint is useful for:
+- Container orchestration health checks (Kubernetes, Docker Swarm)
+- Load balancer health probes
+- Monitoring systems (Prometheus, Datadog, etc.)
+
+Example usage:
+```bash
+curl http://your-domain.com/healthz
+# Returns: OK (with HTTP 200)
+```
+
+Docker Compose automatically configures health checks using this endpoint.
+
 ## Disabling SSL (For Local Development)
 
 By default, SSL is enabled and Caddy will automatically provision certificates. To disable SSL for local development or when running behind another SSL proxy:
@@ -155,6 +175,9 @@ docker build -t ph-caddy-proxy:local .
 ```bash
 # Start the proxy
 docker-compose up -d
+
+# Test health check endpoint
+curl http://localhost/healthz
 
 # Test the proxy
 curl -I http://localhost/static/array.js
