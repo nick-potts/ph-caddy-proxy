@@ -6,10 +6,23 @@
 # - SSL_ENABLED: Enable HTTPS/SSL (default: true)
 
 ${DOMAIN_CONFIG} {
+	# CORS - Allow all origins
+	header {
+		Access-Control-Allow-Origin *
+		Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Authorization"
+	}
+
 	# Health check endpoint
 	handle /healthz {
 		respond "OK" 200
 	}
+
+	# Handle OPTIONS requests for CORS preflight
+	@options {
+		method OPTIONS
+	}
+	respond @options 204
 
 	handle /static {
 		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
