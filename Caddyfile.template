@@ -6,6 +6,13 @@
 # - SSL_ENABLED: Enable HTTPS/SSL (default: true)
 
 ${DOMAIN_CONFIG} {
+	# Structured JSON logging
+	log {
+		format json {
+			time_format rfc3339
+		}
+	}
+
 	# CORS - Allow all origins
 	header {
 		Access-Control-Allow-Origin *
@@ -29,8 +36,6 @@ ${DOMAIN_CONFIG} {
 			header_up Host ${POSTHOG_ASSETS_HOST}
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}
-			header_up X-Forwarded-Host {host}
-			header_up X-Forwarded-Proto {scheme}
 			header_down -Access-Control-Allow-Origin
 		}
 	}
@@ -40,8 +45,6 @@ ${DOMAIN_CONFIG} {
 			header_up Host ${POSTHOG_HOST}
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}
-			header_up X-Forwarded-Host {host}
-			header_up X-Forwarded-Proto {scheme}
 			header_down -Access-Control-Allow-Origin
 		}
 	}
