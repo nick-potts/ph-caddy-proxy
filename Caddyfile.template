@@ -27,8 +27,10 @@ ${DOMAIN_CONFIG} {
 	handle /static {
 		reverse_proxy https://${POSTHOG_ASSETS_HOST}:443 {
 			header_up Host ${POSTHOG_ASSETS_HOST}
-			header_up X-Forwarded-For {remote_host}
 			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
 			header_down -Access-Control-Allow-Origin
 		}
 	}
@@ -36,8 +38,10 @@ ${DOMAIN_CONFIG} {
 	handle {
 		reverse_proxy https://${POSTHOG_HOST}:443 {
 			header_up Host ${POSTHOG_HOST}
-			header_up X-Forwarded-For {remote_host}
 			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
 			header_down -Access-Control-Allow-Origin
 		}
 	}
